@@ -47,7 +47,7 @@ struct Client
 
 pthread_mutex_t mutex_lock;
 bool broadcast_mode = false;
-list<Client> ssl_client;
+list<Client> clientList;
 
 void* t_func(void *data)
 {
@@ -82,7 +82,7 @@ void* t_func(void *data)
 			if (broadcast_mode)
 			{
 				pthread_mutex_lock(&mutex_lock);
-				for(auto it = ssl_client.begin(); it != ssl_client.end();)
+				for(auto it = clientList.begin(); it != clientList.end();)
 				{
 					if((*it).info.num == num)
 					{
@@ -94,7 +94,7 @@ void* t_func(void *data)
 					{
         				SSL_get_error(ssl, sent);
 						pthread_cancel((*it).th);
-						it = ssl_client.erase(it);
+						it = clientList.erase(it);
 						printf("disconnected\n");
 						break;
 					}
@@ -112,11 +112,11 @@ void* t_func(void *data)
     close(sd);          /* close connection */
     
     pthread_mutex_lock(&mutex_lock);
-    for(auto it = ssl_client.begin(); it != ssl_client.end();)
+    for(auto it = clientList.begin(); it != clientList.end();)
 	{
 		if((*it).info.num == num)
 		{
-			it = ssl_client.erase(it);
+			it = clientList.erase(it);
 		}
 		else
 		{
@@ -265,14 +265,25 @@ int main(int count, char *Argc[])
 		if(pthread_create(&th, NULL, t_func, (void *)&info) < 0)
 	    {
 	        perror("thread create error : ");
-	        return -1;
+	        break;
 	    }
 		pthread_detach(th);
 		
 		pthread_mutex_lock(&mutex_lock);
-		ssl_client.push_back(Client(th, ssl, num++));
+		clientList.push_back(Client(th, ssl, num++));
 		pthread_mutex_unlock(&mutex_lock);
     }
+    
+	pthread_mutex_lock(&mutex_lock);
+	for(auto client : clientList)
+	{
+		int sd = SSL_get_fd(client.info.ssl);
+	    SSL_free(client.info.ssl);
+	    close(sd);
+		pthread_cancel(clients.th);
+	}
+	pthread_mutex_unlock(&mutex_lock);
+    
     close(server);          /* close server socket */
     SSL_CTX_free(ctx);         /* release context */
 }
