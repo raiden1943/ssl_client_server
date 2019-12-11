@@ -1,0 +1,59 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 2 (0x2)
+    Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=KR, CN=gilgil
+        Validity
+            Not Before: Mar  1 00:00:00 2014 GMT
+            Not After : Feb 27 00:00:00 2024 GMT
+        Subject: C=KR, CN=test.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:d0:98:2b:83:3a:f7:19:ec:cd:9c:22:b1:ba:37:
+                    90:9a:de:20:33:ee:8e:3a:d3:f7:d4:f7:26:3e:60:
+                    0a:80:ae:de:be:a5:a9:77:01:13:9d:c2:b1:74:1a:
+                    12:a9:99:14:3b:c3:b3:9c:cc:43:9b:d7:13:83:9b:
+                    28:59:28:80:da:2b:16:e9:eb:5f:01:b9:f6:8f:cb:
+                    8f:04:19:42:97:c7:fe:9c:34:e4:7c:32:33:53:2a:
+                    a8:d8:e3:b4:8c:f1:fd:91:86:86:5a:fe:8e:cc:56:
+                    f2:11:e1:bb:6c:83:a1:4a:c4:75:5e:5c:cb:7c:1b:
+                    12:31:52:c5:07:c3:49:07:99
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                9B:E1:D8:44:43:A0:50:09:3F:28:8A:CF:F8:A7:41:FA:17:94:5F:03
+            X509v3 Authority Key Identifier: 
+                DirName:/C=KR/CN=gilgil
+                serial:BC:FE:EF:E9:4A:BC:63:F0
+
+    Signature Algorithm: sha1WithRSAEncryption
+         21:ff:9a:d2:2d:f2:28:2f:2c:72:2e:71:16:ee:b8:6d:e4:d3:
+         df:8e:3e:9e:23:bd:30:d9:84:7a:05:4c:5a:78:23:c4:ef:fb:
+         af:bb:46:1a:a9:b2:29:7e:cb:8f:26:2d:bd:93:b9:be:3d:36:
+         18:48:6b:46:75:c2:75:a5:30:92:08:85:05:ed:27:b9:cc:22:
+         9e:26:c8:44:0d:cb:53:3f:d2:49:2b:80:5e:fc:86:c4:1e:93:
+         ba:bb:4e:68:3a:a8:48:4e:b5:1f:62:cf:af:fd:75:e4:74:67:
+         7d:f8:57:5e:ce:52:9b:46:8e:f6:6c:d3:bd:84:5e:b1:05:2a:
+         16:a3
+-----BEGIN CERTIFICATE-----
+MIICTjCCAbegAwIBAgIBAjANBgkqhkiG9w0BAQUFADAeMQswCQYDVQQGEwJLUjEP
+MA0GA1UEAwwGZ2lsZ2lsMCIYDzIwMTQwMzAxMDAwMDAwWhgPMjAyNDAyMjcwMDAw
+MDBaMCAxCzAJBgNVBAYTAktSMREwDwYDVQQDDAh0ZXN0LmNvbTCBnzANBgkqhkiG
+9w0BAQEFAAOBjQAwgYkCgYEA0Jgrgzr3GezNnCKxujeQmt4gM+6OOtP31PcmPmAK
+gK7evqWpdwETncKxdBoSqZkUO8OznMxDm9cTg5soWSiA2isW6etfAbn2j8uPBBlC
+l8f+nDTkfDIzUyqo2OO0jPH9kYaGWv6OzFbyEeG7bIOhSsR1XlzLfBsSMVLFB8NJ
+B5kCAwEAAaOBlTCBkjAJBgNVHRMEAjAAMCwGCWCGSAGG+EIBDQQfFh1PcGVuU1NM
+IEdlbmVyYXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUm+HYREOgUAk/KIrP+KdB
++heUXwMwOAYDVR0jBDEwL6EipCAwHjELMAkGA1UEBhMCS1IxDzANBgNVBAMMBmdp
+bGdpbIIJALz+7+lKvGPwMA0GCSqGSIb3DQEBBQUAA4GBACH/mtIt8igvLHIucRbu
+uG3k09+OPp4jvTDZhHoFTFp4I8Tv+6+7Rhqpsil+y48mLb2Tub49NhhIa0Z1wnWl
+MJIIhQXtJ7nMIp4myEQNy1M/0kkrgF78hsQek7q7Tmg6qEhOtR9iz6/9deR0Z334
+V17OUptGjvZs072EXrEFKhaj
+-----END CERTIFICATE-----
