@@ -280,7 +280,7 @@ int main(int count, char *Argc[])
 		int sd = SSL_get_fd(client.info.ssl);
 	    SSL_free(client.info.ssl);
 	    close(sd);
-		pthread_cancel(clients.th);
+		pthread_cancel(client.th);
 	}
 	pthread_mutex_unlock(&mutex_lock);
     
