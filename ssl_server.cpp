@@ -49,12 +49,19 @@ pthread_mutex_t mutex_lock;
 bool broadcast_mode = false;
 list<Client> clientList;
 
+void clean_ssl(SSL *ssl)
+{
+	int sd;
+	sd = SSL_get_fd(ssl);	   /* get socket connection */
+	SSL_free(ssl);		 /* release SSL state */
+	close(sd);		  /* close connection */
+	printf("disconnected\n");
+}
+
 void* t_func(void *data)
 {
-	Info info = (*(Info *) data);
-	SSL *ssl = info.ssl;
-	int num = info.num;
-	int sd;
+	SSL *ssl = (*(Info *) data).ssl;
+	int num = (*(Info *) data).num;
 	
 	if ( SSL_accept(ssl) == FAIL )	 /* do SSL-protocol accept */
 		ERR_print_errors_fp(stderr);
@@ -67,36 +74,33 @@ void* t_func(void *data)
 			int received = SSL_read(ssl, buf, sizeof(buf)); /* get request */
 			if (received <= 0) 
 			{
-				SSL_get_error(ssl, received);
+				perror("recv failed");
 				break;
 			}
 			buf[received] = '\0';
 			printf("%s\n", buf);
 			
-			int sent = SSL_write(ssl, buf, strlen(buf)); /* send reply */
-			if (sent == 0)
+			if (!broadcast_mode)
 			{
-				SSL_get_error(ssl, received);
-				break;
+				int sent = SSL_write(ssl, buf, strlen(buf)); /* send reply */
+				if (sent == 0)
+				{
+					SSL_get_error(ssl, received);
+					break;
+				}
 			}
-			if (broadcast_mode)
+			else
 			{
 				pthread_mutex_lock(&mutex_lock);
 				for(auto it = clientList.begin(); it != clientList.end();)
 				{
-					if((*it).info.num == num)
-					{
-						it++;
-						continue;
-					}
 					int sent = SSL_write((*it).info.ssl, buf, strlen(buf));
 					if(sent <= 0)
 					{
-						SSL_get_error(ssl, sent);
+						perror("send failed");
+						clean_ssl((*it).info.ssl);
 						pthread_cancel((*it).th);
 						it = clientList.erase(it);
-						printf("disconnected\n");
-						break;
 					}
 					else
 					{
@@ -107,24 +111,19 @@ void* t_func(void *data)
 			}
 		}
 	}
-	sd = SSL_get_fd(ssl);	   /* get socket connection */
-	SSL_free(ssl);		 /* release SSL state */
-	close(sd);		  /* close connection */
+	
+	clean_ssl(ssl);
 	
 	pthread_mutex_lock(&mutex_lock);
-	for(auto it = clientList.begin(); it != clientList.end();)
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
 		if((*it).info.num == num)
 		{
-			it = clientList.erase(it);
-		}
-		else
-		{
-			it++;
+			clientList.erase(it);
+			break;
 		}
 	}
 	pthread_mutex_unlock(&mutex_lock);
-	printf("disconnected\n");
 }
 
 int OpenListener(int port)
@@ -277,10 +276,8 @@ int main(int count, char *Argc[])
 	pthread_mutex_lock(&mutex_lock);
 	for(auto client : clientList)
 	{
-		int sd = SSL_get_fd(client.info.ssl);
-		SSL_free(client.info.ssl);
-		close(sd);
 		pthread_cancel(client.th);
+		clean_ssl(client.info.ssl);
 	}
 	pthread_mutex_unlock(&mutex_lock);
 	

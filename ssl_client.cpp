@@ -13,7 +13,9 @@
 
 const int BUFSIZE = 1024;
 
-void *t_func(void *data)
+pthread_t recv_thread, send_thread;
+
+void *t_recv(void *data)
 {
 	SSL *ssl = *((SSL **)data);
 	
@@ -23,14 +25,36 @@ void *t_func(void *data)
 		int received = SSL_read(ssl, buf, sizeof(buf)); /* get reply & decrypt */
 		if (received <= 0) 
 		{
-			SSL_get_error(ssl, received);
+			perror("recv failed");
 			break;
 		}
 		buf[received] = 0;
 		printf("%s\n", buf);
 	}
 	
-	exit(0);
+	pthread_cancel(send_thread);
+}
+
+void *t_send(void *data)
+{
+	SSL *ssl = *((SSL **)data);
+	
+	while (1)
+	{
+		char buf[BUFSIZE];
+		
+		scanf("%s", buf);
+		if (strcmp(buf, "quit") == 0) break;
+		
+		int sent = SSL_write(ssl, buf, strlen(buf));   /* encrypt & send message */
+		if (sent <= 0)
+		{
+			perror("send failed");
+			break;
+		}
+	}
+	
+	pthread_cancel(recv_thread);
 }
 
 int OpenConnection(const char *hostname, int port)
@@ -94,7 +118,7 @@ int main(int count, char *strings[])
 {
 	SSL_CTX *ctx;
 	SSL *ssl;
-	int server;
+	int server, status;
 	char *hostname, *portnum;
 	if ( count != 3 )
 	{
@@ -112,36 +136,29 @@ int main(int count, char *strings[])
 	if ( SSL_connect(ssl) == FAIL )   /* perform the connection */
 		ERR_print_errors_fp(stderr);
 	else
-	{
+	{		
 		printf("Connected with %s encryption\n", SSL_get_cipher(ssl));
 		ShowCerts(ssl);		/* get any certs */
 		
-		pthread_t th;
-		if(pthread_create(&th, NULL, t_func, (void *)&ssl) < 0)
+		if(pthread_create(&recv_thread, NULL, t_recv, (void *)&ssl) < 0)
 		{
-			perror("thread create error : ");
+			perror("recv thread create error : ");
 			return -1;
 		}
-		pthread_detach(th);
-		
-		while (1)
+		if(pthread_create(&send_thread, NULL, t_send, (void *)&ssl) < 0)
 		{
-			char buf[BUFSIZE];
-			
-			scanf("%s", buf);
-			if (strcmp(buf, "quit") == 0) break;
-			
-			int sent = SSL_write(ssl, buf, strlen(buf));   /* encrypt & send message */
-			if (sent <= 0)
-			{
-				SSL_get_error(ssl, sent);
-				break;
-			}
+			perror("send thread create error : ");
+			return -1;
 		}
+		
+		pthread_join(recv_thread, (void **)&status);
+		pthread_join(send_thread, (void **)&status);
 		
 		SSL_free(ssl);		/* release connection state */
 	}
 	close(server);		 /* close socket */
 	SSL_CTX_free(ctx);		/* release context */
+	
+	printf("program terminated\n");
 	return 0;
 }
